@@ -62,6 +62,7 @@ export class TryOnWidget {
   private isMirrored: boolean = true;
   private isPipVisible: boolean = false;
   private isMinimized: boolean = false;
+  private isStartingCamera: boolean = false;
   private currentGarment: { blob: Blob; url: string; title: string } | null = null;
   private hasConsent: boolean = false;
 
@@ -431,6 +432,12 @@ export class TryOnWidget {
   }
 
   private async executeStartCamera(): Promise<void> {
+    if (this.isStartingCamera || this.decartService.isSessionActive()) {
+      console.log("[Widget] Camera session already starting or active, ignoring redundant call");
+      return;
+    }
+
+    this.isStartingCamera = true;
     try {
       this.hideError();
       await this.decartService.startSession(this.currentGarment?.blob || null);
@@ -438,10 +445,13 @@ export class TryOnWidget {
     } catch (err: any) {
       console.error("[Widget] Camera start failed:", err);
       this.updateStartStopButton(false);
+    } finally {
+      this.isStartingCamera = false;
     }
   }
 
   public stopCamera(): void {
+    this.isStartingCamera = false;
     this.decartService.stopSession();
     this.remoteVideoEl.srcObject = null;
     this.localVideoEl.srcObject = null;

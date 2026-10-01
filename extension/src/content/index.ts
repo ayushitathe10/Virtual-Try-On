@@ -27,12 +27,7 @@ if (!(window as any).__TRYON_LIVE_INITIALIZED__) {
     widget.applyGarmentFromUrl(garment.url, garment.title);
   });
 
-  // Setup hover "+ Try On" fallback button over images
-  GarmentExtractor.initHoverTryOnButtons((garment) => {
-    console.log("[TryOn Live] Product image clicked via hover button:", garment.url);
-    const widget = getWidget();
-    widget.applyGarmentFromUrl(garment.url, garment.title);
-  });
+  // Clean, single source of truth for product card selection: EcomBadgeInjector handles all garments
 
   // Listen for messages from background script (toolbar action, context menu, popup)
   chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {

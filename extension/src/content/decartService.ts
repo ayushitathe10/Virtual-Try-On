@@ -73,10 +73,9 @@ export class DecartService {
       // Use canonical virtual try-on model
       const model = models.realtime("lucy-vton-3.5");
 
-      // Connect WebRTC stream to Decart
+      // Connect WebRTC stream to Decart (standard tier for reliable credits and global routing)
       this.realtimeClient = await client.realtime.connect(this.localStream, {
         model,
-        speed: "fast",
         onRemoteStream: (remoteStream: MediaStream) => {
           console.log("[DecartService] Received transformed remote stream from Lucy V-TON");
           this.callbacks.onRemoteStream(remoteStream);
@@ -92,21 +91,13 @@ export class DecartService {
             this.callbacks.onStatusChange("error", `Connection ${state}`);
           }
         },
-        initialState: this.currentGarmentBlob
-          ? {
-              image: this.currentGarmentBlob,
-              prompt: {
-                text: "Virtual try-on fitting this garment on the user with natural drape, texture, and realistic contours",
-                enhance: true,
-              },
-            }
-          : undefined,
       });
 
       // Listen for runtime errors or session ended
       this.realtimeClient.on("error", (err: any) => {
         console.error("[DecartService] Realtime client error:", err);
-        this.callbacks.onError(err?.message || "Realtime connection error");
+        const errMsg = err?.message || String(err);
+        this.callbacks.onError(errMsg);
       });
 
       this.realtimeClient.on("sessionEnded", (event: any) => {
@@ -116,6 +107,12 @@ export class DecartService {
       });
 
       console.log("[DecartService] Realtime session established with Lucy V-TON");
+
+      // Apply initial garment once connection is open
+      if (this.currentGarmentBlob) {
+        console.log("[DecartService] Applying queued garment after connect...");
+        await this.setGarment(this.currentGarmentBlob);
+      }
     } catch (err: any) {
       console.error("[DecartService] Failed to start try-on session:", err);
       this.stopSession();
