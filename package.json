@@ -1,0 +1,14 @@
+{
+  "name": "virtual-try-on-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TryOn Live - Chrome Extension (Manifest V3) + Backend using Decart Lucy V-TON",
+  "scripts": {
+    "build": "npm --prefix server run build && npm --prefix extension run build",
+    "server:dev": "npm --prefix server run dev",
+    "server:start": "npm --prefix server run start",
+    "server:build": "npm --prefix server run build",
+    "ext:build": "npm --prefix extension run build",
+    "ext:watch": "npm --prefix extension run watch"
+  }
+}

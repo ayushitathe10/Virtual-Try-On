@@ -1,0 +1,19 @@
+{
+  "name": "tryon-live-extension",
+  "version": "1.0.0",
+  "description": "Chrome Manifest V3 extension for real-time virtual try-on with Decart Lucy V-TON",
+  "scripts": {
+    "build": "node build.cjs",
+    "watch": "node build.cjs --watch",
+    "icons": "node scripts/create-icons.cjs"
+  },
+  "dependencies": {
+    "@decartai/sdk": "^0.2.3"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.312",
+    "esbuild": "^0.25.0",
+    "sharp": "^0.33.5",
+    "typescript": "^5.8.2"
+  }
+}

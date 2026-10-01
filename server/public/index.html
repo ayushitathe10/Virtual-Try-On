@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AURA Fashion Studio — Virtual Try-On Test Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: rgba(26, 34, 52, 0.6);
+      --border: rgba(255, 255, 255, 0.1);
+      --accent: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.35);
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    /* Ambient background glow */
+    .glow-bg {
+      position: fixed;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(6, 182, 212, 0.08) 40%, transparent 70%);
+      filter: blur(80px);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(9, 13, 22, 0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #6366f1, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover, .nav-links a.active {
+      color: #ffffff;
+    }
+
+    .ext-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #a5b4fc;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Hero Banner */
+    .hero {
+      text-align: center;
+      padding: 40px 20px 60px;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      padding: 6px 16px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      color: #cbd5e1;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      font-size: 44px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 40%, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
+    }
+
+    .hero p {
+      font-size: 17px;
+      color: var(--text-muted);
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .instructions-card {
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px dashed rgba(99, 102, 241, 0.4);
+      border-radius: 16px;
+      padding: 20px 24px;
+      max-width: 840px;
+      margin: 32px auto 0;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      text-align: left;
+    }
+
+    .instruction-step {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .step-number {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #818cf8;
+      letter-spacing: 0.5px;
+    }
+
+    .step-title {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: #f1f5f9;
+    }
+
+    .step-desc {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* Product Grid */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.25s ease;
+      cursor: grab;
+      position: relative;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(99, 102, 241, 0.4);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 20px var(--accent-glow);
+    }
+
+    .image-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      background: #0f172a;
+      overflow: hidden;
+    }
+
+    .product-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .product-card:hover .product-image {
+      transform: scale(1.04);
+    }
+
+    .drag-hint {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      right: 10px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      opacity: 0;
+      transform: translateY(6px);
+      transition: all 0.2s ease;
+    }
+
+    .product-card:hover .drag-hint {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tag-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(6px);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .product-info {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .product-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .product-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+
+    .product-price {
+      font-weight: 700;
+      color: #38bdf8;
+    }
+
+    .product-color {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 30px 40px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 768px) {
+      .instructions-card {
+        grid-template-columns: 1fr;
+      }
+      .hero h1 {
+        font-size: 32px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-bg"></div>
+
+  <header>
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="white">
+          <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>
+        </svg>
+      </div>
+      <span class="brand-title">AURA FASHION</span>
+    </div>
+
+    <ul class="nav-links">
+      <li><a href="#" class="active">Collection 2026</a></li>
+      <li><a href="https://www.myntra.com" target="_blank">Myntra</a></li>
+      <li><a href="https://www.zara.com" target="_blank">Zara</a></li>
+      <li><a href="https://www2.hm.com" target="_blank">H&M</a></li>
+      <li><a href="https://www.uniqlo.com" target="_blank">Uniqlo</a></li>
+    </ul>
+
+    <div class="ext-badge">
+      <span>✨ TryOn Live Active</span>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <div class="hero-pill">
+        <span>⚡ Powered by Decart Lucy V-TON Real-Time WebRTC</span>
+      </div>
+      <h1>Drag Any Garment Onto Your Mirror</h1>
+      <p>Click the floating TryOn Live mirror widget, start your webcam, and drag any item below onto the mirror to see it fitted onto you in real time.</p>
+
+      <div class="instructions-card">
+        <div class="instruction-step">
+          <span class="step-number">Step 01</span>
+          <span class="step-title">Start Mirror</span>
+          <span class="step-desc">Open the TryOn Live floating widget on this page and click "Start Camera".</span>
+        </div>
+        <div class="instruction-step">
+          <span class="step-number">Step 02</span>
+          <span class="step-title">Drag Garment</span>
+          <span class="step-desc">Drag any product photo onto the widget, or hover and click "+ Try On".</span>
+        </div>
+        <div class="instruction-step">
+          <span class="step-number">Step 03</span>
+          <span class="step-title">Live Swapping</span>
+          <span class="step-desc">Swap garments continuously mid-session with ultra-low latency WebRTC.</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="section-header">
+      <h2 class="section-title">New Season Essentials</h2>
+      <span style="font-size: 13px; color: var(--text-muted);">8 Curated Items</span>
+    </div>
+
+    <div class="products-grid">
+      <!-- Item 1 -->
+      <article class="product-card" draggable="true">
+        <div class="image-wrap">
+          <span class="tag-badge">Outerwear</span>
+          <img
+            class="product-image"
+            src="https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800&auto=format&fit=crop&q=80"
+            srcset="https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400 400w, https://images.unsplash.com/photo-1551028719-00167b16eac5?w=800 800w"
+            alt="Classic Black Leather Biker Jacket"
+            data-highres="https://images.unsplash.com/photo-1551028719-00167b16eac5?w=1000&auto=format&fit=crop&q=85"
+          />
+          <div class="drag-hint">
+            <span>✋ Drag onto TryOn Live</span>
+          </div>
+        </div>
+        <div class="product-info">
+          <h3 class="product-title">Classic Leather Biker Jacket</h3>
+          <div class="product-meta">
+            <span class="product-price">$249.00</span>
+            <span class="product-color">Obsidian Black</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Item 2 -->
+      <article class="product-card" draggable="true">
+        <div class="image-wrap">
+          <span class="tag-badge">Denim</span>
+          <img
+            class="product-image"
+            src="https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=800&auto=format&fit=crop&q=80"
+            srcset="https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=400 400w, https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=800 800w"
+            alt="Relaxed Indigo Denim Overshirt"
+            data-highres="https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=1000&auto=format&fit=crop&q=85"
+          />
+          <div class="drag-hint">
+            <span>✋ Drag onto TryOn Live</span>
+          </div>
+        </div>
+        <div class="product-info">
+          <h3 class="product-title">Relaxed Indigo Denim Overshirt</h3>
+          <div class="product-meta">
+            <span class="product-price">$89.00</span>
+            <span class="product-color">Vintage Washed Blue</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Item 3 -->
+      <article class="product-card" draggable="true">
+        <div class="image-wrap">
+          <span class="tag-badge">Knitwear</span>
+          <img
+            class="product-image"
+            src="https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800&auto=format&fit=crop&q=80"
+            srcset="https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400 400w, https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=800 800w"
+            alt="Cream Ribbed Crewneck Knit"
+            data-highres="https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=1000&auto=format&fit=crop&q=85"
+          />
+          <div class="drag-hint">
+            <span>✋ Drag onto TryOn Live</span>
+          </div>
+        </div>
+        <div class="product-info">
+          <h3 class="product-title">Cream Ribbed Crewneck Knit</h3>
+          <div class="product-meta">
+            <span class="product-price">$119.00</span>
+            <span class="product-color">Oatmeal / Ecru</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Item 4 -->
+      <article class="product-card" draggable="true">
+        <div class="image-wrap">
+          <span class="tag-badge">Tailored</span>
+          <img
+            class="product-image"
+            src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&auto=format&fit=crop&q=80"
+            srcset="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400 400w, https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800 800w"
+            alt="Camel Double-Breasted Trench Coat"
+            data-highres="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=1000&auto=format&fit=crop&q=85"
+          />
+          <div class="drag-hint">
+            <span>✋ Drag onto TryOn Live</span>
+          </div>
+        </div>
+        <div class="product-info">
+          <h3 class="product-title">Camel Double-Breasted Trench</h3>
+          <div class="product-meta">
+            <span class="product-price">$295.00</span>
+            <span class="product-color">Warm Camel</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Item 5 -->
+      <article class="product-card" draggable="true">
+        <div class="image-wrap">
+          <span class="tag-badge">Casual</span>
+          <img
+            class="product-image"
+            src="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&auto=format&fit=crop&q=80"
+            srcset="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=400 400w, https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800 800w"
+            alt="Heavyweight Forest Green Hoodie"
+            data-highres="https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=1000&auto=format&fit=crop&q=85"
+          />
+          <div class="drag-hint">
+            <span>✋ Drag onto TryOn Live</span>
+          </div>
+        </div>
+        <div class="product-info">
+          <h3 class="product-title">Heavyweight Cotton Hoodie</h3>
+          <div class="product-meta">
+            <span class="product-price">$78.00</span>
+            <span class="product-color">Forest Green</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Item 6 -->
+      <article class="product-card" draggable="true">
+        <div class="image-wrap">
+          <span class="tag-badge">Blazers</span>
+          <img
+            class="product-image"
+            src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800&auto=format&fit=crop&q=80"
+            srcset="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400 400w, https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=800 800w"
+            alt="Structured Charcoal Wool Blazer"
+            data-highres="https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=1000&auto=format&fit=crop&q=85"
+          />
+          <div class="drag-hint">
+            <span>✋ Drag onto TryOn Live</span>
+          </div>
+        </div>
+        <div class="product-info">
+          <h3 class="product-title">Structured Charcoal Wool Blazer</h3>
+          <div class="product-meta">
+            <span class="product-price">$198.00</span>
+            <span class="product-color">Charcoal Grey</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Item 7 -->
+      <article class="product-card" draggable="true">
+        <div class="image-wrap">
+          <span class="tag-badge">Shirts</span>
+          <img
+            class="product-image"
+            src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&auto=format&fit=crop&q=80"
+            srcset="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400 400w, https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800 800w"
+            alt="Crisp Poplin Button-Down Shirt"
+            data-highres="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=1000&auto=format&fit=crop&q=85"
+          />
+          <div class="drag-hint">
+            <span>✋ Drag onto TryOn Live</span>
+          </div>
+        </div>
+        <div class="product-info">
+          <h3 class="product-title">Crisp White Poplin Shirt</h3>
+          <div class="product-meta">
+            <span class="product-price">$65.00</span>
+            <span class="product-color">Pure White</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- Item 8 -->
+      <article class="product-card" draggable="true">
+        <div class="image-wrap">
+          <span class="tag-badge">Dresses</span>
+          <img
+            class="product-image"
+            src="https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=800&auto=format&fit=crop&q=80"
+            srcset="https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400 400w, https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=800 800w"
+            alt="Floral Tiered Midi Dress"
+            data-highres="https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=1000&auto=format&fit=crop&q=85"
+          />
+          <div class="drag-hint">
+            <span>✋ Drag onto TryOn Live</span>
+          </div>
+        </div>
+        <div class="product-info">
+          <h3 class="product-title">Floral Tiered Midi Dress</h3>
+          <div class="product-meta">
+            <span class="product-price">$145.00</span>
+            <span class="product-color">Midnight Floral</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <footer>
+    <p>TryOn Live &bull; Powered by Decart Lucy V-TON Real-Time WebRTC Virtual Fitting Mirror</p>
+  </footer>
+</body>
+</html>
