@@ -18,14 +18,7 @@ if (!(window as any).__TRYON_LIVE_INITIALIZED__) {
     return widgetInstance;
   };
 
-  // Pre-initialize widget DOM
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", () => {
-      getWidget();
-    });
-  } else {
-    getWidget();
-  }
+  // Notice: Widget is created lazily ONLY when user clicks a "Try On" button or triggers the extension
 
   // Setup interactive persistent "✨ Try On" badges on Myntra and all fashion product cards
   EcomBadgeInjector.init((garment) => {

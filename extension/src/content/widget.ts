@@ -81,6 +81,7 @@ export class TryOnWidget {
     this.render();
     this.bindEvents();
     this.loadConsentState();
+    this.hide(); // Guaranteed hidden by default on page load!
   }
 
   private render(): void {
@@ -375,7 +376,8 @@ export class TryOnWidget {
     const minimizeBtn = this.shadow.querySelector("#minimize-btn");
     const closeBtn = this.shadow.querySelector("#close-btn");
 
-    minimizeBtn?.addEventListener("click", () => {
+    minimizeBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
       this.isMinimized = !this.isMinimized;
       if (this.isMinimized) {
         this.containerEl.classList.add("minimized");
@@ -384,7 +386,16 @@ export class TryOnWidget {
       }
     });
 
-    closeBtn?.addEventListener("click", () => {
+    // Expand back on header click if minimized
+    this.headerEl.addEventListener("click", (e) => {
+      if (this.isMinimized && !(e.target as HTMLElement).closest(".icon-btn")) {
+        this.isMinimized = false;
+        this.containerEl.classList.remove("minimized");
+      }
+    });
+
+    closeBtn?.addEventListener("click", (e) => {
+      e.stopPropagation();
       this.hide();
     });
 
@@ -701,10 +712,12 @@ export class TryOnWidget {
 
   public show(): void {
     this.containerEl.style.display = "flex";
+    this.containerEl.classList.add("active");
   }
 
   public hide(): void {
     this.stopCamera();
+    this.containerEl.classList.remove("active");
     this.containerEl.style.display = "none";
   }
 
