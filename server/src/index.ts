@@ -62,13 +62,83 @@ const tokenLimiter = rateLimit({
   },
 });
 
+/**
+ * Quick verification to check if the Decart API key has active credits
+ * Returns false if Decart explicitly returns "Insufficient credits" or close code 1008
+ */
+async function verifyDecartCredits(apiKey: string): Promise<{ ok: boolean; message?: string }> {
+  return new Promise((resolve) => {
+    let settled = false;
+    const timeout = setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        resolve({ ok: true }); // do not block if network is slow
+      }
+    }, 2500);
+
+    try {
+      const wsUrl = `wss://api3.decart.ai/v1/stream?api_key=${apiKey}&model=lucy-vton-3.5`;
+      const ws = new WebSocket(wsUrl);
+
+      ws.addEventListener("open", () => {
+        ws.send(JSON.stringify({ type: "livekit_join", passthrough: true }));
+      });
+
+      ws.addEventListener("message", (event) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timeout);
+        try {
+          const data = JSON.parse(event.data.toString());
+          if (data.type === "error" && typeof data.error === "string" && data.error.toLowerCase().includes("credit")) {
+            ws.close();
+            return resolve({ ok: false, message: data.error });
+          }
+        } catch {}
+        ws.close();
+        resolve({ ok: true });
+      });
+
+      ws.addEventListener("close", (event) => {
+        if (settled) return;
+        if (event.code === 1008) {
+          settled = true;
+          clearTimeout(timeout);
+          return resolve({ ok: false, message: "Insufficient credits (Decart error code 1008)" });
+        }
+      });
+
+      ws.addEventListener("error", () => {
+        if (!settled) {
+          settled = true;
+          clearTimeout(timeout);
+          resolve({ ok: true });
+        }
+      });
+    } catch {
+      if (!settled) {
+        settled = true;
+        clearTimeout(timeout);
+        resolve({ ok: true });
+      }
+    }
+  });
+}
+
 // Health check endpoint
-app.get("/api/health", (_req: Request, res: Response) => {
+app.get("/api/health", async (_req: Request, res: Response) => {
+  let creditCheck: { ok: boolean; message?: string } = { ok: true, message: "Active" };
+  if (DECART_API_KEY && DECART_API_KEY !== "your_decart_api_key_here") {
+    creditCheck = await verifyDecartCredits(DECART_API_KEY);
+  }
+
   res.json({
-    status: "ok",
+    status: creditCheck.ok ? "ok" : "insufficient_credits",
     service: "TryOn Live Token Server",
     model: "lucy-vton-3.5",
     hasApiKey: Boolean(DECART_API_KEY && DECART_API_KEY !== "your_decart_api_key_here"),
+    creditsValid: creditCheck.ok,
+    creditStatus: creditCheck.ok ? "Active" : creditCheck.message,
     timestamp: new Date().toISOString(),
   });
 });
@@ -87,6 +157,17 @@ app.post("/api/token", tokenLimiter, async (req: Request, res: Response) => {
       });
     }
 
+    // Pre-verify if Decart API key has active credits before proceeding
+    const creditVerification = await verifyDecartCredits(DECART_API_KEY);
+    if (!creditVerification.ok) {
+      console.warn("[Token Server] Decart API key has insufficient credits:", creditVerification.message);
+      return res.status(402).json({
+        error: "Decart API Key has Insufficient Credits (0 balance). Please provide a new API key with active credits in server/.env or top up your Decart account.",
+        code: "INSUFFICIENT_CREDITS",
+        details: creditVerification.message,
+      });
+    }
+
     console.log("[Token Server] Minting short-lived client token for Lucy V-TON session...");
 
     // Initialize Decart SDK client on server with long-lived key
@@ -102,6 +183,7 @@ app.post("/api/token", tokenLimiter, async (req: Request, res: Response) => {
     });
 
     console.log(`[Token Server] Successfully minted client token. Expires at: ${tokenResponse.expiresAt}`);
+
 
     // Return client token details to extension
     return res.json({

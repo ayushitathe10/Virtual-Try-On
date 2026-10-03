@@ -116,8 +116,21 @@ export class DecartService {
     } catch (err: any) {
       console.error("[DecartService] Failed to start try-on session:", err);
       this.stopSession();
-      this.callbacks.onError(err?.message || "Failed to start virtual try-on");
-      throw err;
+
+      const rawMsg = err?.message || String(err);
+      let friendlyMsg = rawMsg;
+
+      if (
+        rawMsg.includes("Insufficient credits") ||
+        rawMsg.includes("Stale connect attempt") ||
+        rawMsg.includes("1008") ||
+        rawMsg.includes("policy_violation")
+      ) {
+        friendlyMsg = "Decart API: Insufficient credits on account. Please add credits or provide a new Decart API key in server/.env.";
+      }
+
+      this.callbacks.onError(friendlyMsg);
+      throw new Error(friendlyMsg);
     } finally {
       this.isConnecting = false;
     }
