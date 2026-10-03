@@ -6,9 +6,9 @@
 
 body {
   width: 360px;
-  background: #090d16;
-  color: #f1f5f9;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #ffffff;
+  color: #0f172a;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   margin: 0;
   padding: 16px;
   user-select: none;
@@ -37,35 +37,37 @@ body {
 .logo-badge {
   width: 34px;
   height: 34px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #6366f1, #06b6d4);
+  border-radius: 9px;
+  background: #0f172a;
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
 }
 
 .brand-name {
   font-size: 15px;
   font-weight: 700;
-  background: linear-gradient(135deg, #ffffff, #cbd5e1);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #0f172a;
+  letter-spacing: -0.2px;
 }
 
 .brand-tagline {
   font-size: 10.5px;
-  color: #94a3b8;
+  color: #64748b;
 }
 
 .status-indicator {
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 600;
-  padding: 4px 8px;
+  padding: 3px 8px;
   border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
 }
 
 .status-dot {
@@ -76,23 +78,26 @@ body {
 }
 
 .status-indicator.checking {
-  background: rgba(234, 179, 8, 0.15);
-  color: #facc15;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
 }
 
 .status-indicator.connected {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
 }
 
 .status-indicator.disconnected {
-  background: rgba(239, 68, 68, 0.15);
-  color: #f87171;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
 }
 
 /* Launch Button */
 .launch-btn {
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  background: #0f172a;
   color: #ffffff;
   border: none;
   border-radius: 12px;
@@ -104,14 +109,15 @@ body {
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.15);
   transition: all 0.2s ease;
+  letter-spacing: 0.1px;
 }
 
 .launch-btn:hover {
-  background: linear-gradient(135deg, #4f46e5, #4338ca);
+  background: #1e293b;
   transform: translateY(-1px);
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.6);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.22);
 }
 
 .launch-btn:active {
@@ -120,8 +126,8 @@ body {
 
 /* Cards */
 .card {
-  background: rgba(30, 41, 59, 0.45);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 12px 14px;
   display: flex;
@@ -136,30 +142,32 @@ body {
 }
 
 .section-title {
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #cbd5e1;
+  color: #475569;
 }
 
 .badge {
   font-size: 10px;
   font-weight: 600;
-  padding: 2px 7px;
+  padding: 2.5px 7px;
   border-radius: 6px;
-  background: rgba(148, 163, 184, 0.2);
-  color: #94a3b8;
+  background: #f1f5f9;
+  color: #64748b;
 }
 
 .badge.allowed {
-  background: rgba(16, 185, 129, 0.2);
-  color: #34d399;
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
 }
 
 .badge.denied {
-  background: rgba(239, 68, 68, 0.2);
-  color: #f87171;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
 }
 
 /* Form inputs */
@@ -171,7 +179,7 @@ body {
 
 .input-group label {
   font-size: 11px;
-  color: #94a3b8;
+  color: #475569;
   font-weight: 500;
 }
 
@@ -182,18 +190,19 @@ body {
 
 .input-row input {
   flex: 1;
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
   border-radius: 8px;
   padding: 8px 10px;
-  color: #f8fafc;
+  color: #0f172a;
   font-size: 12px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .input-row input:focus {
-  border-color: #6366f1;
+  border-color: #0f172a;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.08);
 }
 
 .field-hint {
@@ -203,11 +212,11 @@ body {
 }
 
 .field-hint.error {
-  color: #f87171;
+  color: #dc2626;
 }
 
 .field-hint.success {
-  color: #34d399;
+  color: #059669;
 }
 
 /* Buttons */
@@ -226,32 +235,35 @@ body {
 }
 
 .btn.secondary {
-  background: rgba(99, 102, 241, 0.2);
-  color: #a5b4fc;
-  border: 1px solid rgba(99, 102, 241, 0.35);
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .btn.secondary:hover {
-  background: rgba(99, 102, 241, 0.3);
-  color: #ffffff;
+  background: #f8fafc;
+  border-color: #94a3b8;
 }
 
 .btn.ghost-full {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  color: #cbd5e1;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #e2e8f0;
   padding: 8px 10px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
 .btn.ghost-full:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #cbd5e1;
 }
 
 /* Tips list */
 .tips-card {
-  background: rgba(30, 41, 59, 0.3);
+  background: #f8fafc;
 }
 
 .tips-list {
@@ -263,7 +275,7 @@ body {
 
 .tips-list li {
   font-size: 11px;
-  color: #94a3b8;
+  color: #475569;
   line-height: 1.45;
   position: relative;
   padding-left: 14px;
@@ -273,13 +285,13 @@ body {
   content: "•";
   position: absolute;
   left: 2px;
-  color: #6366f1;
+  color: #0f172a;
   font-size: 14px;
   line-height: 1;
 }
 
 .tips-list strong {
-  color: #e2e8f0;
+  color: #0f172a;
 }
 
 /* Stores Footer */
@@ -302,13 +314,13 @@ body {
 }
 
 .store-link {
-  color: #818cf8;
-  text-decoration: none;
+  color: #0f172a;
+  text-decoration: underline;
+  text-underline-offset: 2px;
   font-weight: 600;
-  transition: color 0.15s;
+  transition: opacity 0.15s;
 }
 
 .store-link:hover {
-  color: #c7d2fe;
-  text-decoration: underline;
+  opacity: 0.7;
 }

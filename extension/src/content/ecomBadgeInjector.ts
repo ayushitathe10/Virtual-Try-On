@@ -23,19 +23,19 @@ export class EcomBadgeInjector {
         align-items: center !important;
         gap: 6px !important;
         padding: 6px 12px !important;
-        background: rgba(15, 23, 42, 0.90) !important;
-        backdrop-filter: blur(16px) saturate(180%) !important;
-        -webkit-backdrop-filter: blur(16px) saturate(180%) !important;
-        border: 1px solid rgba(99, 102, 241, 0.6) !important;
+        background: rgba(255, 255, 255, 0.94) !important;
+        backdrop-filter: blur(20px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+        border: 1px solid rgba(0, 0, 0, 0.08) !important;
         border-radius: 999px !important;
-        color: #ffffff !important;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        font-size: 11.5px !important;
-        font-weight: 700 !important;
-        letter-spacing: 0.3px !important;
+        color: #0f172a !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+        font-size: 11px !important;
+        font-weight: 600 !important;
+        letter-spacing: -0.1px !important;
         cursor: pointer !important;
-        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5), 0 0 12px rgba(99, 102, 241, 0.4) !important;
-        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.08), 0 2px 6px -1px rgba(15, 23, 42, 0.04) !important;
+        transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
         pointer-events: auto !important;
         user-select: none !important;
         text-transform: none !important;
@@ -43,19 +43,27 @@ export class EcomBadgeInjector {
       }
 
       .tryon-live-badge-btn:hover {
-        background: linear-gradient(135deg, #4f46e5, #06b6d4) !important;
-        border-color: #a5b4fc !important;
-        transform: translateY(-2px) scale(1.06) !important;
-        box-shadow: 0 8px 24px rgba(79, 70, 229, 0.6), 0 0 16px rgba(6, 182, 212, 0.5) !important;
+        background: #0f172a !important;
+        color: #ffffff !important;
+        border-color: #0f172a !important;
+        transform: translateY(-2px) scale(1.03) !important;
+        box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.25) !important;
       }
 
       .tryon-live-badge-btn:active {
-        transform: translateY(0) scale(0.98) !important;
+        transform: translateY(0) scale(0.97) !important;
       }
 
-      .tryon-sparkle-icon {
-        font-size: 13px !important;
-        filter: drop-shadow(0 0 4px #818cf8) !important;
+      .tryon-badge-svg {
+        width: 12px !important;
+        height: 12px !important;
+        stroke: currentColor !important;
+        flex-shrink: 0 !important;
+        transition: transform 0.2s ease !important;
+      }
+
+      .tryon-live-badge-btn:hover .tryon-badge-svg {
+        transform: rotate(-8deg) scale(1.1) !important;
       }
 
       /* Product Detail Page (PDP) Hero Button */
@@ -63,30 +71,35 @@ export class EcomBadgeInjector {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 8px !important;
+        gap: 10px !important;
         width: 100% !important;
         box-sizing: border-box !important;
-        margin: 12px 0 !important;
-        padding: 13px 20px !important;
-        background: linear-gradient(135deg, #6366f1, #06b6d4) !important;
-        color: #ffffff !important;
-        border: none !important;
-        border-radius: 10px !important;
-        font-size: 14px !important;
-        font-weight: 700 !important;
-        letter-spacing: 0.5px !important;
+        margin: 14px 0 !important;
+        padding: 13px 22px !important;
+        background: #ffffff !important;
+        color: #0f172a !important;
+        border: 1.5px solid #0f172a !important;
+        border-radius: 999px !important;
+        font-size: 13.5px !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.1px !important;
         cursor: pointer !important;
-        box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45) !important;
-        transition: all 0.2s ease !important;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-        text-transform: uppercase !important;
+        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06) !important;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+        text-transform: none !important;
         line-height: 1 !important;
       }
 
       .tryon-live-pdp-action-btn:hover {
-        background: linear-gradient(135deg, #4f46e5, #0891b2) !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 8px 26px rgba(99, 102, 241, 0.65) !important;
+        background: #0f172a !important;
+        color: #ffffff !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18) !important;
+      }
+
+      .tryon-live-pdp-action-btn:active {
+        transform: translateY(0) scale(0.99) !important;
       }
     `;
     (document.head || document.documentElement).appendChild(style);
@@ -231,7 +244,10 @@ export class EcomBadgeInjector {
       btn.id = "tryon-live-pdp-btn";
       btn.className = "tryon-live-pdp-action-btn";
       btn.innerHTML = `
-        <span class="tryon-sparkle-icon">✨</span>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a3 3 0 0 0-3 3c0 .77.34 1.46.88 1.94L2 15h20l-7.88-8.06A2.99 2.99 0 0 0 15 5a3 3 0 0 0-3-3z"/>
+          <path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/>
+        </svg>
         <span>Virtual Try-On Live</span>
       `;
       btn.addEventListener("click", (e) => {
@@ -265,7 +281,10 @@ export class EcomBadgeInjector {
     badge.className = "tryon-live-badge-btn";
     badge.title = "Try this garment on with TryOn Live";
     badge.innerHTML = `
-      <span class="tryon-sparkle-icon">✨</span>
+      <svg class="tryon-badge-svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2a3 3 0 0 0-3 3c0 .77.34 1.46.88 1.94L2 15h20l-7.88-8.06A2.99 2.99 0 0 0 15 5a3 3 0 0 0-3-3z"/>
+        <path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/>
+      </svg>
       <span>Try On</span>
     `;
 
