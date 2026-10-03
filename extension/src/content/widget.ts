@@ -2,29 +2,6 @@ import { WIDGET_STYLES } from "./styles";
 import { DecartService } from "./decartService";
 import { GarmentExtractor, ExtractedGarment } from "./garmentExtractor";
 
-// High-resolution sample apparel references for immediate testing
-const SAMPLE_GARMENTS = [
-  {
-    title: "Biker Jacket",
-    url: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&auto=format&fit=crop&q=80",
-    thumb: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=100&auto=format&fit=crop&q=80",
-  },
-  {
-    title: "Denim Shirt",
-    url: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=600&auto=format&fit=crop&q=80",
-    thumb: "https://images.unsplash.com/photo-1576995853123-5a10305d93c0?w=100&auto=format&fit=crop&q=80",
-  },
-  {
-    title: "Knit Sweater",
-    url: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=600&auto=format&fit=crop&q=80",
-    thumb: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=100&auto=format&fit=crop&q=80",
-  },
-  {
-    title: "Trench Coat",
-    url: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&auto=format&fit=crop&q=80",
-    thumb: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=100&auto=format&fit=crop&q=80",
-  },
-];
 
 export class TryOnWidget {
   private hostEl: HTMLElement;
@@ -143,6 +120,15 @@ export class TryOnWidget {
         <div class="video-stage mirrored" id="video-stage">
           <video id="remote-video" autoplay playsinline muted></video>
 
+          <!-- In-Stage Active Garment Floating Chip (Clothes you are trying on) -->
+          <div class="stage-garment-badge" id="stage-garment-badge">
+            <img class="stage-garment-thumb" id="stage-garment-thumb" src="" alt="Garment" />
+            <div class="stage-garment-info">
+              <span class="stage-garment-label">TRYING ON</span>
+              <span class="stage-garment-title" id="stage-garment-title">Garment</span>
+            </div>
+          </div>
+
           <!-- Local Webcam PiP Preview -->
           <div class="pip-preview-container" id="pip-container">
             <span class="pip-label">Webcam</span>
@@ -152,7 +138,7 @@ export class TryOnWidget {
           <!-- Stage State Overlay -->
           <div class="stage-overlay" id="stage-overlay">
             <div class="stage-icon" id="stage-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                 <circle cx="12" cy="13" r="4"></circle>
               </svg>
@@ -164,42 +150,54 @@ export class TryOnWidget {
 
           <!-- Privacy Consent Modal -->
           <div class="consent-dialog" id="consent-dialog">
-            <div class="consent-icon">
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-              </svg>
-            </div>
-            <div class="consent-title">Camera & Privacy Consent</div>
-            <div class="consent-body">
-              TryOn Live streams your video feed in real time to Decart's Lucy V-TON model for virtual fitting.
-            </div>
-            <div class="consent-points">
-              <div class="consent-point">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span>Zero images or video stored on server</span>
+            <div class="consent-content-wrapper">
+              <div class="consent-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
               </div>
-              <div class="consent-point">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span>Encrypted real-time WebRTC stream</span>
+              <div class="consent-title">Camera &amp; Privacy Consent</div>
+
+              <!-- In-Modal Garment Preview (Clothes You Are Trying) -->
+              <div class="consent-garment-chip" id="consent-garment-chip" style="display: none;">
+                <img class="consent-garment-thumb" id="consent-garment-thumb" src="" alt="Selected garment" />
+                <div class="consent-garment-info">
+                  <span class="consent-garment-badge">TRYING ON</span>
+                  <span class="consent-garment-title" id="consent-garment-title">Product Name</span>
+                </div>
               </div>
-              <div class="consent-point">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                <span>Camera shuts off immediately when closed</span>
+
+              <div class="consent-body">
+                Streams your video feed to Decart's Lucy V-TON model for real-time virtual fitting.
               </div>
-            </div>
-            <div class="consent-actions">
-              <button class="primary-btn" id="consent-allow-btn">Accept & Start</button>
-              <button class="secondary-btn" id="consent-cancel-btn">Cancel</button>
+              <div class="consent-points">
+                <div class="consent-point">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Zero images or video stored on server</span>
+                </div>
+                <div class="consent-point">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Encrypted real-time WebRTC stream</span>
+                </div>
+                <div class="consent-point">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  <span>Camera shuts off immediately when closed</span>
+                </div>
+              </div>
+              <div class="consent-actions">
+                <button class="primary-btn" id="consent-allow-btn">Accept &amp; Start</button>
+                <button class="secondary-btn" id="consent-cancel-btn">Cancel</button>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Garment Drop Zone -->
+        <!-- Garment Drop Zone & Active Garment Display -->
         <div class="drop-zone" id="drop-zone" title="Drag and drop any clothing image here">
           <!-- Default Drop Prompt -->
           <div class="drop-zone-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
               <polyline points="17 8 12 3 7 8"></polyline>
               <line x1="12" y1="3" x2="12" y2="15"></line>
@@ -209,21 +207,21 @@ export class TryOnWidget {
             <div class="drop-zone-title">
               <span>Drop clothing image here</span>
             </div>
-            <div class="drop-zone-subtitle">Drag from Zara, H&M, Uniqlo or right-click "Try on"</div>
+            <div class="drop-zone-subtitle">Drag from Zara, Myntra, H&M or click "Try On"</div>
           </div>
 
-          <!-- Active Garment Card -->
+          <!-- Active Garment Card (Clothes Being Tried) -->
           <div class="active-garment-card" id="active-garment-card">
             <img class="garment-thumb" id="garment-thumb" src="" alt="Active garment" />
             <div class="garment-details">
               <div class="garment-name" id="garment-name">Garment loaded</div>
               <div class="garment-status">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                 <span>Garment Active (Lucy V-TON)</span>
               </div>
             </div>
             <button class="remove-garment-btn" id="remove-garment-btn" title="Remove Garment">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
@@ -231,25 +229,16 @@ export class TryOnWidget {
           </div>
         </div>
 
-        <!-- Quick Preset Samples -->
-        <div class="quick-samples-bar">
-          <div class="samples-label">
-            <span>Quick Samples</span>
-            <span style="font-size: 9px; color: #94a3b8;">Click to try</span>
-          </div>
-          <div class="samples-grid" id="samples-grid"></div>
-        </div>
-
         <!-- Main Controls Bar -->
         <div class="controls-bar">
           <button class="primary-btn" id="start-stop-btn">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="5 3 19 12 5 21 5 3"></polygon>
             </svg>
             <span id="start-btn-text">Start Camera</span>
           </button>
           <button class="secondary-btn" id="mirror-btn" title="Flip / Mirror Camera">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="16 3 21 3 21 8"></polyline>
               <line x1="4" y1="20" x2="21" y2="3"></line>
               <polyline points="21 16 21 21 16 21"></polyline>
@@ -258,7 +247,7 @@ export class TryOnWidget {
             </svg>
           </button>
           <button class="secondary-btn" id="pip-btn" title="Toggle Webcam Overlay">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
               <rect x="13" y="10" width="7" height="5" rx="1" ry="1"></rect>
             </svg>
@@ -302,22 +291,6 @@ export class TryOnWidget {
     this.errorBannerEl = this.shadow.querySelector("#error-banner") as HTMLElement;
     this.errorMsgEl = this.shadow.querySelector("#error-msg") as HTMLElement;
     this.resizeHandleEl = this.shadow.querySelector("#resize-handle") as HTMLElement;
-
-    // Render Quick Samples
-    const samplesGrid = this.shadow.querySelector("#samples-grid") as HTMLElement;
-    SAMPLE_GARMENTS.forEach((sample) => {
-      const chip = document.createElement("div");
-      chip.className = "sample-chip";
-      chip.title = `Try ${sample.title}`;
-      chip.innerHTML = `
-        <img class="sample-thumb" src="${sample.thumb}" alt="${sample.title}" />
-        <span class="sample-title">${sample.title}</span>
-      `;
-      chip.addEventListener("click", () => {
-        this.applyGarmentFromUrl(sample.url, sample.title);
-      });
-      samplesGrid.appendChild(chip);
-    });
   }
 
   private bindEvents(): void {
@@ -424,6 +397,21 @@ export class TryOnWidget {
   private requestStartCamera(): void {
     this.hideError();
     if (!this.hasConsent) {
+      // Sync in-consent garment chip (Clothes you are trying shown directly in consent frame)
+      const consentChip = this.shadow.querySelector("#consent-garment-chip") as HTMLElement;
+      const consentThumb = this.shadow.querySelector("#consent-garment-thumb") as HTMLImageElement;
+      const consentTitle = this.shadow.querySelector("#consent-garment-title") as HTMLElement;
+      if (consentChip && consentThumb && consentTitle) {
+        if (this.currentGarment && this.garmentThumbEl.src) {
+          consentThumb.src = this.garmentThumbEl.src;
+          consentTitle.textContent = this.currentGarment.title;
+          consentTitle.title = this.currentGarment.title;
+          consentChip.style.display = "flex";
+        } else {
+          consentChip.style.display = "none";
+        }
+      }
+
       this.consentDialogEl.classList.add("visible");
       this.handleStatusChange("requesting_consent", "Awaiting consent");
     } else {
@@ -552,13 +540,39 @@ export class TryOnWidget {
         title: title || "Selected Garment",
       };
 
-      // Update UI active card
+      // Update UI active card (Clean luxury frame, no dashed border or stray upload icon)
+      this.dropZoneEl.classList.add("has-garment");
       this.activeGarmentCardEl.classList.add("visible");
       const dropPrompt = this.shadow.querySelector("#drop-prompt") as HTMLElement;
       if (dropPrompt) dropPrompt.style.display = "none";
+      const dropIcon = this.shadow.querySelector(".drop-zone-icon") as HTMLElement;
+      if (dropIcon) dropIcon.style.display = "none";
 
       this.garmentThumbEl.src = dataUrl;
       this.garmentNameEl.textContent = this.currentGarment.title;
+      this.garmentNameEl.title = this.currentGarment.title;
+
+      // Update In-Stage Floating Badge (Clothes you are trying on directly in camera frame)
+      const stageBadge = this.shadow.querySelector("#stage-garment-badge") as HTMLElement;
+      const stageThumb = this.shadow.querySelector("#stage-garment-thumb") as HTMLImageElement;
+      const stageTitle = this.shadow.querySelector("#stage-garment-title") as HTMLElement;
+      if (stageBadge && stageThumb && stageTitle) {
+        stageThumb.src = dataUrl;
+        stageTitle.textContent = this.currentGarment.title;
+        stageTitle.title = this.currentGarment.title;
+        stageBadge.classList.add("visible");
+      }
+
+      // Update In-Consent Garment Chip
+      const consentChip = this.shadow.querySelector("#consent-garment-chip") as HTMLElement;
+      const consentThumb = this.shadow.querySelector("#consent-garment-thumb") as HTMLImageElement;
+      const consentTitle = this.shadow.querySelector("#consent-garment-title") as HTMLElement;
+      if (consentChip && consentThumb && consentTitle) {
+        consentThumb.src = dataUrl;
+        consentTitle.textContent = this.currentGarment.title;
+        consentTitle.title = this.currentGarment.title;
+        consentChip.style.display = "flex";
+      }
 
       // If camera session is active, swap garment mid-session!
       if (this.decartService.isSessionActive()) {
@@ -577,10 +591,22 @@ export class TryOnWidget {
 
   public clearGarment(): void {
     this.currentGarment = null;
+    this.dropZoneEl.classList.remove("has-garment");
     this.activeGarmentCardEl.classList.remove("visible");
     const dropPrompt = this.shadow.querySelector("#drop-prompt") as HTMLElement;
     if (dropPrompt) dropPrompt.style.display = "block";
+    const dropIcon = this.shadow.querySelector(".drop-zone-icon") as HTMLElement;
+    if (dropIcon) dropIcon.style.display = "flex";
     this.garmentThumbEl.src = "";
+
+    // Clear In-Stage Badge
+    const stageBadge = this.shadow.querySelector("#stage-garment-badge") as HTMLElement;
+    if (stageBadge) stageBadge.classList.remove("visible");
+
+    // Clear Consent Chip
+    const consentChip = this.shadow.querySelector("#consent-garment-chip") as HTMLElement;
+    if (consentChip) consentChip.style.display = "none";
+
     this.decartService.clearGarment();
   }
 
