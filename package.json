@@ -4,6 +4,8 @@
   "private": true,
   "description": "TryOn Live - Chrome Extension (Manifest V3) + Backend using Decart Lucy V-TON",
   "scripts": {
+    "start": "npm run server:start",
+    "dev": "npm run server:dev",
     "build": "npm --prefix server run build && npm --prefix extension run build",
     "server:dev": "npm --prefix server run dev",
     "server:start": "npm --prefix server run start",
